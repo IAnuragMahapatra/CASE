@@ -9,20 +9,45 @@
 }
 
 .header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
   border-bottom: 1px solid var(--border-color);
   padding-bottom: var(--spacing-md);
 }
 
-.header h1 {
+.school-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.school-logo {
+  height: 60px;
+  width: auto;
+}
+
+.school-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.app-title h1 {
   font-size: 2.5rem;
   font-weight: 800;
   letter-spacing: -0.05em;
   text-transform: uppercase;
+  margin: 0;
 }
 
-.header p {
+.app-title p {
   color: var(--text-secondary);
   font-size: 1rem;
+  margin: 0;
 }
 
 .card {
@@ -207,7 +232,15 @@
     gap: var(--spacing-lg);
   }
   
-  .header h1 {
+  .school-logo {
+    height: 40px;
+  }
+
+  .school-name {
+    font-size: 0.85rem;
+  }
+  
+  .app-title h1 {
     font-size: 2rem;
   }
   

@@ -3,6 +3,7 @@ import { CASEEngine, type AdjustmentResult } from './engine';
 import { Calendar, Users, Settings2, Save } from 'lucide-react';
 import { supabase } from './supabaseClient';
 import type { Teacher, TimetableSlot, AdjustmentRecord } from './engine/types';
+import logo from './assets/logo.png';
 import './App.css';
 
 function App() {
@@ -64,8 +65,14 @@ function App() {
   return (
     <div className="app-container">
       <header className="header">
-        <h1>CASE</h1>
-        <p>Class Adjustment and Substitution Engine</p>
+        <div className="school-banner">
+          <img src={logo} alt="DAV CMC Logo" className="school-logo" />
+          <h2 className="school-name">DAV PUBLIC SCHOOL, MCL, IB VALLEY AREA, BRAJRAJNAGAR</h2>
+        </div>
+        <div className="app-title">
+          <h1>CASE</h1>
+          <p>Class Adjustment and Substitution Engine</p>
+        </div>
       </header>
 
       <main className="main-layout">
