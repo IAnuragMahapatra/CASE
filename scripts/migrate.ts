@@ -44,8 +44,9 @@ async function main() {
     const designation = parts[3];
     const subject = parts[4];
     
-    if (name && name !== 'New Nurse') {
-      teachers.push({ name, designation, subject_group: subject, protected: false });
+    if (name) {
+      const isProtected = ['Principal', 'Librarian', 'Counsellor', 'Staff'].includes(designation) || name === 'New Nurse' || name === 'Mr. Abhishek Mahapatra';
+      teachers.push({ name, designation, subject_group: subject, protected: isProtected });
     }
   }
 
@@ -67,7 +68,7 @@ async function main() {
   }
 
   // Basic normalization for matching names from excel
-  const normalizeName = (name: string) => name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const normalizeName = (name: string) => name.toLowerCase().replace(/^(mr|mrs|ms|miss)\s*\.?\s*/, '').replace(/[^a-z0-9]/g, '');
 
   const teacherMap = new Map();
   insertedTeachers.forEach(t => {
@@ -168,20 +169,19 @@ async function main() {
                       className = className.replace(/\(.*?\)/, '').trim();
                   }
 
-                  // Very basic level extraction
-                  let classLevel = '';
-                  if (className.startsWith('XII')) classLevel = 'XII';
-                  else if (className.startsWith('XI')) classLevel = 'XI';
-                  else if (className.startsWith('X')) classLevel = 'X';
-                  else if (className.startsWith('IX')) classLevel = 'IX';
-                  else if (className.startsWith('VIII')) classLevel = 'VIII';
-                  else if (className.startsWith('VII')) classLevel = 'VII';
-                  else if (className.startsWith('VI')) classLevel = 'VI';
-                  else if (className.startsWith('V')) classLevel = 'V';
-                  else if (className.startsWith('IV')) classLevel = 'IV';
-                  else if (className.startsWith('III')) classLevel = 'III';
-                  else if (className.startsWith('II')) classLevel = 'II';
-                  else if (className.startsWith('I')) classLevel = 'I';
+                  let classLevel = '0';
+                  if (className.startsWith('XII')) classLevel = '12';
+                  else if (className.startsWith('XI')) classLevel = '11';
+                  else if (className.startsWith('X')) classLevel = '10';
+                  else if (className.startsWith('IX')) classLevel = '9';
+                  else if (className.startsWith('VIII')) classLevel = '8';
+                  else if (className.startsWith('VII')) classLevel = '7';
+                  else if (className.startsWith('VI')) classLevel = '6';
+                  else if (className.startsWith('V')) classLevel = '5';
+                  else if (className.startsWith('IV')) classLevel = '4';
+                  else if (className.startsWith('III')) classLevel = '3';
+                  else if (className.startsWith('II')) classLevel = '2';
+                  else if (className.startsWith('I')) classLevel = '1';
 
                   slots.push({
                       day: mapping.day,
