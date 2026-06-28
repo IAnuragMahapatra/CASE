@@ -1,4 +1,3 @@
-import { Designation } from './types';
 
 export const CONFIG = {
   DAILY_LIMIT: 6,
