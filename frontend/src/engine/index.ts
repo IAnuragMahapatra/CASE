@@ -14,22 +14,20 @@ export interface AdjustmentResult {
 export class CASEEngine {
     private teachers: Map<string, Teacher>;
     private allSlots: TimetableSlot[];
-    private windowCounts: Map<string, number>;
+    private monthlyCounts: Map<string, number>;
     
     constructor(teachers: Teacher[], slots: TimetableSlot[], records: AdjustmentRecord[], targetDate: string) {
         this.teachers = new Map(teachers.map(t => [t.id, t]));
         this.allSlots = slots;
         
-        this.windowCounts = new Map();
-        const target = new Date(targetDate);
+        this.monthlyCounts = new Map();
+        
+        const [year, monthStr] = targetDate.split('-');
+        const targetMonth = parseInt(year + monthStr, 10);
         
         for (const record of records) {
-            const recordDate = new Date(record.date);
-            const diffTime = target.getTime() - recordDate.getTime();
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            if (diffDays >= 0 && diffDays <= 30) {
-                this.windowCounts.set(record.adjusted_teacher_id, (this.windowCounts.get(record.adjusted_teacher_id) || 0) + 1);
+            if (record.month === targetMonth) {
+                this.monthlyCounts.set(record.adjusted_teacher_id, (this.monthlyCounts.get(record.adjusted_teacher_id) || 0) + 1);
             }
         }
     }
@@ -137,9 +135,9 @@ export class CASEEngine {
             const match = getDesignationMatch(candidate.designation, vacancy.class_level);
             let score = getTierScore(correlation, match);
             
-            const windowCount = this.windowCounts.get(candidate.id) || 0;
+            const monthlyCount = this.monthlyCounts.get(candidate.id) || 0;
             
-            score -= (windowCount * CONFIG.FAIRNESS_WEIGHT);
+            score -= (monthlyCount * CONFIG.FAIRNESS_WEIGHT);
             if (consecutiveViolation) score -= CONFIG.CONSECUTIVE_PENALTY;
             if (dailyTotal >= CONFIG.DAILY_LIMIT) score -= CONFIG.OVER_LIMIT_PENALTY;
             if (candidate.protected) score -= CONFIG.PROTECTED_PENALTY;
@@ -162,9 +160,9 @@ export class CASEEngine {
         
         scoredCandidates.sort((a, b) => {
             if (b.tier_score !== a.tier_score) return b.tier_score - a.tier_score;
-            const windowA = this.windowCounts.get(a.adjusted_teacher_id) || 0;
-            const windowB = this.windowCounts.get(b.adjusted_teacher_id) || 0;
-            if (windowA !== windowB) return windowA - windowB;
+            const monthA = this.monthlyCounts.get(a.adjusted_teacher_id) || 0;
+            const monthB = this.monthlyCounts.get(b.adjusted_teacher_id) || 0;
+            if (monthA !== monthB) return monthA - monthB;
             return a.adjusted_teacher_id.localeCompare(b.adjusted_teacher_id);
         });
         
