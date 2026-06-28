@@ -6,6 +6,8 @@ import type { Teacher, TimetableSlot, AdjustmentRecord } from './engine/types';
 import logo from './assets/logo.png';
 import './App.css';
 
+const DAY_MAPPING = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
 function App() {
   const [selectedDate, setSelectedDate] = useState<string>('2026-06-29'); // A Monday
   const [searchQuery, setSearchQuery] = useState('');
@@ -17,6 +19,8 @@ function App() {
   const [slots, setSlots] = useState<TimetableSlot[]>([]);
   const [records, setRecords] = useState<AdjustmentRecord[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -41,14 +45,61 @@ function App() {
 
   const engine = useMemo(() => {
     if (loading) return null;
-    return new CASEEngine(teachers, slots, records, 202606);
-  }, [loading, teachers, slots, records]);
+    return new CASEEngine(teachers, slots, records, selectedDate);
+  }, [loading, teachers, slots, records, selectedDate]);
 
   const handleGenerate = () => {
     if (!engine) return;
     const result = engine.generatePlan(selectedDate, Array.from(absentTeacherIds));
     setPlan(result);
     setActiveView('results');
+  };
+
+  const handleSave = async () => {
+    if (!plan || plan.length === 0) return;
+    setSaving(true);
+    
+    // 1. Delete existing records for the date
+    const { error: deleteError } = await supabase
+      .from('adjustment_records')
+      .delete()
+      .eq('date', selectedDate);
+      
+    if (deleteError) {
+      alert('Failed to clear old records: ' + deleteError.message);
+      setSaving(false);
+      return;
+    }
+    
+    // 2. Prepare new records
+    const [year, monthStr] = selectedDate.split('-');
+    const newRecords = plan.map(p => ({
+      date: selectedDate,
+      month: parseInt(year + monthStr, 10),
+      day: DAY_MAPPING[new Date(selectedDate).getDay()] || 'MON',
+      period: p.slot.period,
+      class_name: p.slot.class_name,
+      subject: p.slot.subject,
+      original_teacher_id: p.original_teacher_id,
+      adjusted_teacher_id: p.adjusted_teacher_id,
+      correlation_level: p.correlation_level,
+      designation_match: p.designation_match,
+      soft_constraints_violated: p.soft_constraints_violated
+    }));
+    
+    const { error: insertError } = await supabase
+      .from('adjustment_records')
+      .insert(newRecords);
+      
+    if (insertError) {
+      alert('Failed to save new records: ' + insertError.message);
+    } else {
+      alert('Plan saved successfully!');
+      // Update local state to reflect new records
+      const { data: updatedRecords } = await supabase.from('adjustment_records').select('*');
+      if (updatedRecords) setRecords(updatedRecords);
+    }
+    setSaving(false);
   };
 
   const toggleTeacher = (id: string) => {
@@ -139,7 +190,7 @@ function App() {
                   </button>
                   <h2 className="card-title" style={{ border: 'none', margin: 0, padding: 0 }}>Adjustment Plan</h2>
                 </div>
-                <button className="btn btn-secondary"><Save size={16} /> Save Plan</button>
+                <button className="btn btn-secondary" onClick={handleSave} disabled={saving}><Save size={16} /> {saving ? 'Saving...' : 'Save Plan'}</button>
               </div>
 
               <div className="table-container">

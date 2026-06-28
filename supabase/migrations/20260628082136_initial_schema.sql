@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE teachers (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     designation TEXT,
     subject_group TEXT,
@@ -15,7 +15,7 @@ CREATE TABLE teacher_subjects (
 );
 
 CREATE TABLE timetable_slots (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     day TEXT NOT NULL,
     period INTEGER NOT NULL,
     class_name TEXT NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE timetable_slots (
 );
 
 CREATE TABLE adjustment_records (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     date DATE NOT NULL,
     month INTEGER NOT NULL,
     day TEXT NOT NULL,
