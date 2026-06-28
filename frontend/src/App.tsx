@@ -143,6 +143,15 @@ function App() {
     return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading application data...</div>;
   }
 
+  if (errorMsg) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center', color: '#ef4444' }}>
+        <h2>Database Connection Error</h2>
+        <p>{errorMsg}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="app-container">
       <header className="header">

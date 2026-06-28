@@ -22,3 +22,5 @@ design_skills/
 internal_docs/
 AGENTS.md
 .design-state.json
+
+.env*
