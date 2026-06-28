@@ -46,7 +46,7 @@ async function main() {
     
     if (name) {
       const protectedNames = ['Mr. N. C. Sahoo', 'Mrs. Poonam Sinha', 'Mrs. Sangita Dash', 'Mr. Abhishek Mahapatra'];
-      const isProtected = ['Principal', 'Librarian', 'Counsellor', 'Staff'].includes(designation) || protectedNames.includes(name);
+      const isProtected = (['Principal', 'Librarian', 'Counsellor', 'Staff'].includes(designation) || protectedNames.includes(name)) && name !== 'New Nurse';
       teachers.push({ name, designation, subject_group: subject, protected: isProtected });
     }
   }
@@ -183,6 +183,7 @@ async function main() {
                   else if (className.startsWith('III')) classLevel = '3';
                   else if (className.startsWith('II')) classLevel = '2';
                   else if (className.startsWith('I')) classLevel = '1';
+                  else if (className.startsWith('NURSERY') || className.startsWith('LKG') || className.startsWith('UKG')) classLevel = '0';
 
                   slots.push({
                       day: mapping.day,
