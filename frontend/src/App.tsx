@@ -20,26 +20,36 @@ function App() {
   const [slots, setSlots] = useState<TimetableSlot[]>([]);
   const [records, setRecords] = useState<AdjustmentRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     async function loadData() {
-      const [
-        { data: teachersData },
-        { data: slotsData },
-        { data: recordsData }
-      ] = await Promise.all([
-        supabase.from('teachers').select('*'),
-        supabase.from('timetable_slots').select('*'),
-        supabase.from('adjustment_records').select('*')
-      ]);
+      try {
+        const [
+          { data: teachersData, error: teachersError },
+          { data: slotsData, error: slotsError },
+          { data: recordsData, error: recordsError }
+        ] = await Promise.all([
+          supabase.from('teachers').select('*'),
+          supabase.from('timetable_slots').select('*'),
+          supabase.from('adjustment_records').select('*')
+        ]);
 
-      if (teachersData) setTeachers(teachersData);
-      if (slotsData) setSlots(slotsData);
-      if (recordsData) setRecords(recordsData);
-      
-      setLoading(false);
+        if (teachersError) throw teachersError;
+        if (slotsError) throw slotsError;
+        if (recordsError) throw recordsError;
+
+        if (teachersData) setTeachers(teachersData);
+        if (slotsData) setSlots(slotsData);
+        if (recordsData) setRecords(recordsData);
+      } catch (err: any) {
+        console.error('Supabase fetch error:', err);
+        setErrorMsg(err.message || 'Failed to fetch data from Supabase');
+      } finally {
+        setLoading(false);
+      }
     }
     loadData();
   }, []);
