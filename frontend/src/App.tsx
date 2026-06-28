@@ -70,7 +70,7 @@ function App() {
       <header className="header">
         <div className="school-banner">
           <img src={logo} alt="DAV CMC Logo" className="school-logo" />
-          <h2 className="school-name">DAV PUBLIC SCHOOL, MCL, IB VALLEY AREA, BRAJRAJNAGAR</h2>
+          <h2 className="school-name">DAV PUBLIC SCHOOL,<br/>MCL, IB VALLEY AREA, BRAJRAJNAGAR</h2>
         </div>
         <div className="app-title-badge">
           <span><strong>CASE</strong> : Class Adjustment and Substitution Engine</span>
