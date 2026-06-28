@@ -1,5 +1,5 @@
 export type Designation = "PGT" | "TGT" | "PRT" | "PPRT" | "Staff" | "Librarian" | "Counsellor" | string;
-export type Day = "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT";
+export type Day = "SUN" | "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT";
 
 export interface Teacher {
   id: string;
