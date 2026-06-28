@@ -1,12 +1,12 @@
 :root {
-  --bg-color: #000000;
-  --surface-color: #111111;
-  --surface-hover: #222222;
-  --border-color: #333333;
-  --text-primary: #ffffff;
-  --text-secondary: #aaaaaa;
-  --accent-color: #ffffff;
-  --accent-hover: #e0e0e0;
+  --bg-color: #ffffff;
+  --surface-color: #f9fafb;
+  --surface-hover: #f3f4f6;
+  --border-color: #e5e7eb;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --accent-color: #000000;
+  --accent-hover: #374151;
   
   --error-color: #ff4444;
   --success-color: #44ff44;

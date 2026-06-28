@@ -68,7 +68,7 @@ function App() {
         <p>Class Adjustment and Substitution Engine</p>
       </header>
 
-      <main style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem' }}>
+      <main className="main-layout">
         <section className="input-section">
           <div className="card">
             <h2 className="card-title">Setup Adjustment</h2>

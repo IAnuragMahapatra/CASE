@@ -1,6 +1,6 @@
 {
   "constrain": {
-    "completedAt": "2026-06-28T14:05:00Z",
+    "completedAt": "2026-06-28T14:18:00Z",
     "conceptualDirection": {
       "audience": "School Administrators and Schedulers",
       "memorableThing": "Instant Class Adjustments",
@@ -8,8 +8,8 @@
     },
     "colorStrategy": "restrained",
     "theme": {
-      "mode": "dark",
-      "sceneJustification": "High contrast black and white theme requested by user for maximum focus."
+      "mode": "light",
+      "sceneJustification": "High contrast white and black theme requested by user for maximum focus."
     },
     "fontPair": {
       "display": "Inter, system-ui",
@@ -22,12 +22,12 @@
     "tokens": {
       "primitive": {
         "colors": {
-          "background": "#000000",
-          "surface": "#111111",
-          "surface-hover": "#222222",
-          "text": "#ffffff",
-          "text-secondary": "#888888",
-          "border": "#333333"
+          "background": "#ffffff",
+          "surface": "#f9fafb",
+          "surface-hover": "#f3f4f6",
+          "text": "#111827",
+          "text-secondary": "#6b7280",
+          "border": "#e5e7eb"
         }
       },
       "motion": {
