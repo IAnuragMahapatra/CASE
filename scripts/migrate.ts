@@ -142,6 +142,11 @@ async function main() {
           let normName = normalizeName(teacherName);
           let teacherId = teacherMap.get(normName);
           
+          const getSubjectGroup = (tid: string) => {
+              const t = insertedTeachers.find(it => it.id === tid);
+              return t ? t.subject_group : '';
+          };
+          
           if (!teacherId) {
               // Try finding partial match
               for (const [norm, id] of teacherMap.entries()) {
@@ -168,6 +173,10 @@ async function main() {
                   if (match) {
                       subject = match[1].trim();
                       className = className.replace(/\(.*?\)/, '').trim();
+                  }
+                  
+                  if (!subject) {
+                      subject = getSubjectGroup(teacherId);
                   }
 
                   let classLevel = '0';

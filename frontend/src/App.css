@@ -119,7 +119,7 @@
   margin-bottom: var(--spacing-md);
 }
 
-.form-group:nth-of-type(2) {
+.input-section .form-group:nth-of-type(2) {
   flex: 1;
   overflow: hidden;
   margin-bottom: var(--spacing-md);

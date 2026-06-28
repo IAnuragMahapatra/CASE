@@ -288,14 +288,15 @@ function App() {
                   </thead>
                   <tbody>
                     {plan.length > 0 ? plan.map((p, i) => {
-                      const orig = teachers.find(t => t.id === p.original_teacher_id)?.name;
+                      const origTeacher = teachers.find(t => t.id === p.original_teacher_id);
+                      const orig = origTeacher?.name;
                       const adj = teachers.find(t => t.id === p.adjusted_teacher_id)?.name;
                       
                       return (
                         <tr key={i}>
                           <td>{p.slot.period}</td>
                           <td>{p.slot.class_name}</td>
-                          <td>{p.slot.subject}</td>
+                          <td>{p.slot.subject || origTeacher?.subject_group || ''}</td>
                           <td style={{ color: 'var(--text-secondary)' }}>{orig}</td>
                           <td style={{ fontWeight: 600 }}>{adj}</td>
                           <td><span className="badge">{p.correlation_level}</span></td>
@@ -375,7 +376,7 @@ function App() {
                             <tr key={record.id}>
                               <td>{record.period}</td>
                               <td>{record.class_name}</td>
-                              <td>{record.subject}</td>
+                              <td>{record.subject || orig?.subject_group || ''}</td>
                               <td style={{ color: 'var(--text-secondary)' }}>{orig?.name || record.original_teacher_id}</td>
                               <td style={{ fontWeight: 600 }}>{adj?.name || record.adjusted_teacher_id}</td>
                             </tr>
