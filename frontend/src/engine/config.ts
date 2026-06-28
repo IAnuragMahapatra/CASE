@@ -40,20 +40,67 @@ export const SUBJECT_CORRELATION: Record<string, { high: string[], medium: strin
   'General': { high: [], medium: [] }
 };
 
-const DESIGNATION_WEIGHTS: Record<string, number> = {
-  'PGT': 3,
-  'TGT': 2,
-  'PRT': 1,
-  'PPRT': 0
+export const HOLIDAYS: Record<string, string> = {
+    "2026-04-03": "Good Friday",
+    "2026-04-14": "Maha Visuba Sankranti & Dr. Ambedkar Jayanti",
+    "2026-06-26": "Muharram",
+    "2026-07-16": "Ratha Yatra",
+    "2026-08-26": "Birthday of Prophet Mohammed",
+    "2026-08-27": "Raksha Bandhan / Jhulan Purnima",
+    "2026-09-04": "Janmashtami",
+    "2026-09-14": "Ganesh Puja",
+    "2026-09-15": "Nuakhai",
+    "2026-10-10": "Mahalaya",
+    "2026-11-08": "Diwali / Kali Puja",
+    "2026-11-24": "Guru Nanak Jayanti",
+    "2026-12-01": "Prathamastami",
+    "2026-12-25": "Christmas",
+    "2027-01-01": "New Year Day",
+    "2027-01-14": "Makar Sankranti / Pongal",
+    "2027-02-11": "Saraswati Puja",
+    "2027-03-06": "Maha Sivaratri",
+    "2027-03-22": "Dola Purnima",
+    "2027-03-23": "Holi",
+    "2027-03-26": "Good Friday"
 };
 
-export function getDesignationMatch(candidateDesignation: string, requiredLevel: string): 'OK' | 'MISMATCH' {
-  if (!requiredLevel) return 'OK'; // If slot doesn't have a specific level
+export const VACATIONS = [
+    { start: "2026-04-19", end: "2026-06-17", name: "Summer Vacation" },
+    { start: "2026-10-17", end: "2026-10-26", name: "Durga Puja Vacation" },
+    { start: "2026-12-26", end: "2026-12-31", name: "Winter Vacation" }
+];
+
+export function getDesignationMatch(candidateDesignation: string, requiredLevelStr: string): 'OK' | 'MISMATCH' {
+  if (!requiredLevelStr) return 'OK'; // If slot doesn't have a specific level
   
-  const cLevel = DESIGNATION_WEIGHTS[candidateDesignation] ?? -1;
-  const rLevel = DESIGNATION_WEIGHTS[requiredLevel] ?? -1;
+  const reqClass = parseInt(requiredLevelStr, 10);
+  if (isNaN(reqClass)) return 'OK';
+
+  let minClass = 0;
+  let maxClass = 12;
+
+  switch (candidateDesignation) {
+    case 'PPRT':
+      minClass = 0;
+      maxClass = 2;
+      break;
+    case 'PRT':
+      minClass = 1;
+      maxClass = 8;
+      break;
+    case 'TGT':
+      minClass = 5;
+      maxClass = 12;
+      break;
+    case 'PGT':
+      minClass = 9;
+      maxClass = 12;
+      break;
+  }
   
-  if (cLevel >= rLevel) return 'OK';
+  if (reqClass >= minClass && reqClass <= maxClass) {
+    return 'OK';
+  }
   return 'MISMATCH';
 }
 
