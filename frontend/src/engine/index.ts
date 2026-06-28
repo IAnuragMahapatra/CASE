@@ -1,4 +1,4 @@
-import { Teacher, TimetableSlot, AdjustmentRecord, Day } from './types';
+import type { Teacher, TimetableSlot, AdjustmentRecord, Day } from './types';
 import { CONFIG, getCorrelationLevel, getDesignationMatch, getTierScore, getGroupForSubject } from './config';
 
 export interface AdjustmentResult {

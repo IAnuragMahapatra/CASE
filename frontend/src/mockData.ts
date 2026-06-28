@@ -1,4 +1,4 @@
-import { Teacher, TimetableSlot, AdjustmentRecord } from './engine/types';
+import type { Teacher, TimetableSlot, AdjustmentRecord } from './engine/types';
 
 export const mockTeachers: Teacher[] = [
     { id: 't1', name: 'Mr. Susanta Kumar Pradhan', designation: 'PGT', subject_group: 'Physics', protected: true },
