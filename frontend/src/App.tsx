@@ -346,7 +346,7 @@ function App() {
                   type="date" 
                   value={historyDate}
                   onChange={(e) => setHistoryDate(e.target.value)}
-                  className="date-picker"
+                  className="input-field"
                 />
               </div>
               

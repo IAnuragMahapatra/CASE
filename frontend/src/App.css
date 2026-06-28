@@ -1,4 +1,4 @@
-﻿.app-container {
+.app-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--spacing-xl) var(--spacing-md);
@@ -49,7 +49,9 @@
   padding: 0.4rem 1.2rem;
   border-radius: 9999px;
   border: 1px solid var(--border-color);
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .app-title-badge strong {
@@ -190,6 +192,7 @@
 .data-table th, .data-table td {
   padding: var(--spacing-sm) var(--spacing-md);
   border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
 }
 
 .data-table th {
@@ -292,9 +295,16 @@
   }
 
   .school-name {
-    font-size: 1.1rem;
+    font-size: 1rem;
+    text-align: center;
   }
   
+  .app-title-badge {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+    gap: 0.5rem;
+  }
+
   .app-title h1 {
     display: none;
   }
