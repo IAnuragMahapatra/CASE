@@ -220,8 +220,6 @@
 
 @media (min-width: 768px) {
   .main-layout {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
     gap: var(--spacing-xl);
   }
 }

@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { CASEEngine, type AdjustmentResult } from './engine';
-import { Calendar, Users, Settings2, Save } from 'lucide-react';
+import { Calendar, Users, Settings2, Save, ArrowLeft } from 'lucide-react';
 import { supabase } from './supabaseClient';
 import type { Teacher, TimetableSlot, AdjustmentRecord } from './engine/types';
 import logo from './assets/logo.png';
@@ -10,6 +10,7 @@ function App() {
   const [selectedDate, setSelectedDate] = useState<string>('2026-06-29'); // A Monday
   const [absentTeacherIds, setAbsentTeacherIds] = useState<Set<string>>(new Set());
   const [plan, setPlan] = useState<AdjustmentResult[] | null>(null);
+  const [activeView, setActiveView] = useState<'selection' | 'results'>('selection');
   
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [slots, setSlots] = useState<TimetableSlot[]>([]);
@@ -46,6 +47,7 @@ function App() {
     if (!engine) return;
     const result = engine.generatePlan(selectedDate, Array.from(absentTeacherIds));
     setPlan(result);
+    setActiveView('results');
   };
 
   const toggleTeacher = (id: string) => {
@@ -76,6 +78,7 @@ function App() {
       </header>
 
       <main className="main-layout">
+        {activeView === 'selection' ? (
         <section className="input-section">
           <div className="card">
             <h2 className="card-title">Setup Adjustment</h2>
@@ -111,12 +114,17 @@ function App() {
             </button>
           </div>
         </section>
-
+        ) : (
         <section className="output-section">
           {plan ? (
             <div className="card">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h2 className="card-title" style={{ border: 'none', margin: 0, padding: 0 }}>Adjustment Plan</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <button className="btn btn-secondary" onClick={() => setActiveView('selection')} style={{ padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <ArrowLeft size={16} /> Back
+                  </button>
+                  <h2 className="card-title" style={{ border: 'none', margin: 0, padding: 0 }}>Adjustment Plan</h2>
+                </div>
                 <button className="btn btn-secondary"><Save size={16} /> Save Plan</button>
               </div>
 
@@ -174,6 +182,7 @@ function App() {
             </div>
           )}
         </section>
+        )}
       </main>
     </div>
   );
