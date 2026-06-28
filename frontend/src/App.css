@@ -2,7 +2,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--spacing-xl) var(--spacing-md);
-  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
@@ -281,7 +281,7 @@
 
 @media (max-width: 767px) {
   .app-container {
-    padding: var(--spacing-md) var(--spacing-sm);
+    padding: var(--spacing-lg) var(--spacing-md);
     gap: var(--spacing-lg);
   }
   

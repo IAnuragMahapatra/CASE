@@ -73,7 +73,7 @@ function App() {
           <h2 className="school-name">DAV PUBLIC SCHOOL, MCL, IB VALLEY AREA, BRAJRAJNAGAR</h2>
         </div>
         <div className="app-title-badge">
-          <span><strong>CASE</strong> &mdash; Class Adjustment and Substitution Engine</span>
+          <span><strong>CASE</strong> : Class Adjustment and Substitution Engine</span>
         </div>
       </header>
 
