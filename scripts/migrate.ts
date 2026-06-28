@@ -45,7 +45,8 @@ async function main() {
     const subject = parts[4];
     
     if (name) {
-      const isProtected = ['Principal', 'Librarian', 'Counsellor', 'Staff'].includes(designation) || name === 'New Nurse' || name === 'Mr. Abhishek Mahapatra';
+      const protectedNames = ['Mr. N. C. Sahoo', 'Mrs. Poonam Sinha', 'Mrs. Sangita Dash', 'Mr. Abhishek Mahapatra'];
+      const isProtected = ['Principal', 'Librarian', 'Counsellor', 'Staff'].includes(designation) || protectedNames.includes(name);
       teachers.push({ name, designation, subject_group: subject, protected: isProtected });
     }
   }
