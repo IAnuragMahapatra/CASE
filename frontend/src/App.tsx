@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { CASEEngine, AdjustmentResult } from './engine';
+import { CASEEngine, type AdjustmentResult } from './engine';
 import { Calendar, Users, Settings2, Save } from 'lucide-react';
 import { supabase } from './supabaseClient';
 import type { Teacher, TimetableSlot, AdjustmentRecord } from './engine/types';
