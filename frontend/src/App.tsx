@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { CASEEngine, type AdjustmentResult } from './engine';
-import { Calendar, Users, Settings2, Save, ArrowLeft } from 'lucide-react';
+import { Calendar, Users, Settings2, Save, ArrowLeft, Search } from 'lucide-react';
 import { supabase } from './supabaseClient';
 import type { Teacher, TimetableSlot, AdjustmentRecord } from './engine/types';
 import logo from './assets/logo.png';
@@ -8,6 +8,7 @@ import './App.css';
 
 function App() {
   const [selectedDate, setSelectedDate] = useState<string>('2026-06-29'); // A Monday
+  const [searchQuery, setSearchQuery] = useState('');
   const [absentTeacherIds, setAbsentTeacherIds] = useState<Set<string>>(new Set());
   const [plan, setPlan] = useState<AdjustmentResult[] | null>(null);
   const [activeView, setActiveView] = useState<'selection' | 'results'>('selection');
@@ -67,13 +68,13 @@ function App() {
   return (
     <div className="app-container">
       <header className="header">
-        <div className="school-banner">
-          <img src={logo} alt="DAV CMC Logo" className="school-logo" />
-          <h2 className="school-name">DAV PUBLIC SCHOOL, MCL, IB VALLEY AREA, BRAJRAJNAGAR</h2>
-        </div>
         <div className="app-title">
           <h1>CASE</h1>
           <p>Class Adjustment and Substitution Engine</p>
+        </div>
+        <div className="school-banner">
+          <img src={logo} alt="DAV CMC Logo" className="school-logo" />
+          <h2 className="school-name">DAV PUBLIC SCHOOL, MCL, IB VALLEY AREA, BRAJRAJNAGAR</h2>
         </div>
       </header>
 
@@ -95,8 +96,22 @@ function App() {
 
             <div className="form-group">
               <label><Users size={14} style={{ display: 'inline', marginRight: '4px' }}/> Absent Teachers</label>
+              <div className="search-box">
+                <Search size={16} className="search-icon" />
+                <input 
+                  type="text" 
+                  placeholder="Search teachers by name, subject, or designation..." 
+                  className="input-field search-input"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
               <div className="multi-select-container">
-                {teachers.map(t => (
+                {teachers.filter(t => 
+                  t.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                  t.subject_group.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                  t.designation.toLowerCase().includes(searchQuery.toLowerCase())
+                ).map(t => (
                   <label key={t.id} className="checkbox-item">
                     <input 
                       type="checkbox" 
