@@ -87,6 +87,47 @@ export class CASEEngine {
                 }
             }
             
+            if (!assignedTeacher) {
+                const periodSet = periodAssignments.get(vacancy.period);
+                if (periodSet) {
+                    for (const assignedTeacherId of periodSet) {
+                        const originalAdjustmentIndex = results.findIndex(
+                            r => r.adjusted_teacher_id === assignedTeacherId && r.slot.period === vacancy.period
+                        );
+                        if (originalAdjustmentIndex !== -1) {
+                            const originalAdjustment = results[originalAdjustmentIndex];
+                            
+                            periodAssignments.get(vacancy.period)!.delete(assignedTeacherId);
+                            teacherDailyTotal.set(assignedTeacherId, teacherDailyTotal.get(assignedTeacherId)! - 1);
+                            
+                            const candidatesForCurrent = this.getCandidates(vacancy, 4, absentTeacherIds, periodAssignments, teacherDailyTotal, originalTeacher);
+                            const canTakeCurrent = candidatesForCurrent.find(c => c.adjusted_teacher_id === assignedTeacherId);
+                            
+                            if (canTakeCurrent) {
+                                const originalVacancyTeacher = this.teachers.get(originalAdjustment.slot.teacher_id)!;
+                                const candidatesForOriginal = this.getCandidates(originalAdjustment.slot, 4, absentTeacherIds, periodAssignments, teacherDailyTotal, originalVacancyTeacher);
+                                
+                                if (candidatesForOriginal.length > 0) {
+                                    const newTeacherForOriginal = candidatesForOriginal[0];
+                                    assignedTeacher = canTakeCurrent;
+                                    results[originalAdjustmentIndex] = newTeacherForOriginal;
+                                    
+                                    periodAssignments.get(vacancy.period)!.add(newTeacherForOriginal.adjusted_teacher_id);
+                                    teacherDailyTotal.set(newTeacherForOriginal.adjusted_teacher_id, (teacherDailyTotal.get(newTeacherForOriginal.adjusted_teacher_id) || 0) + 1);
+                                    
+                                    // Add a note about backtracking
+                                    canTakeCurrent.soft_constraints_violated.push('1-hop Backtrack');
+                                    break;
+                                }
+                            }
+                            
+                            periodAssignments.get(vacancy.period)!.add(assignedTeacherId);
+                            teacherDailyTotal.set(assignedTeacherId, teacherDailyTotal.get(assignedTeacherId)! + 1);
+                        }
+                    }
+                }
+            }
+            
             if (assignedTeacher) {
                 results.push(assignedTeacher);
                 if (!periodAssignments.has(vacancy.period)) periodAssignments.set(vacancy.period, new Set());
