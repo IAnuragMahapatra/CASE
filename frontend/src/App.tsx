@@ -1,11 +1,13 @@
 import { useState, useMemo, useEffect } from 'react';
 import { CASEEngine, type AdjustmentResult } from './engine';
 import { HOLIDAYS, VACATIONS } from './engine/config';
-import { Calendar, Users, Settings2, Save, ArrowLeft, Search } from 'lucide-react';
+import { Calendar, Users, Settings2, Save, ArrowLeft, Search, Info, History, X, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { supabase } from './supabaseClient';
 import type { Teacher, TimetableSlot, AdjustmentRecord } from './engine/types';
 import logo from './assets/logo.png';
+import { TeacherManual } from './TeacherManual';
 import './App.css';
+import './toast.css';
 
 const DAY_MAPPING = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
@@ -23,6 +25,15 @@ function App() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+  const [isManualOpen, setIsManualOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [historyDate, setHistoryDate] = useState<string>('2026-06-29');
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     async function loadData() {
@@ -94,7 +105,7 @@ function App() {
       .eq('date', selectedDate);
       
     if (deleteError) {
-      alert('Failed to clear old records: ' + deleteError.message);
+      showToast('Failed to clear old records: ' + deleteError.message, 'error');
       setSaving(false);
       return;
     }
@@ -123,9 +134,9 @@ function App() {
       .insert(newRecords);
       
     if (insertError) {
-      alert('Failed to save new records: ' + insertError.message);
+      showToast('Failed to save new records: ' + insertError.message, 'error');
     } else {
-      alert('Plan saved successfully!');
+      showToast('Plan saved successfully!', 'success');
       // Update local state to reflect new records
       const { data: updatedRecords } = await supabase.from('adjustment_records').select('*');
       if (updatedRecords) setRecords(updatedRecords);
@@ -165,6 +176,14 @@ function App() {
         </div>
         <div className="app-title-badge">
           <span><strong>CASE</strong> : Class Adjustment and Substitution Engine</span>
+          <div className="header-actions">
+            <button className="icon-button" onClick={() => setIsHistoryOpen(true)} title="View Saved Plans">
+              <History size={18} />
+            </button>
+            <button className="icon-button" onClick={() => setIsManualOpen(true)} title="Quick Guide">
+              <Info size={18} />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -309,6 +328,94 @@ function App() {
         </section>
         )}
       </main>
+
+      {/* History Modal */}
+      {isHistoryOpen && (
+        <div className="modal-overlay" onClick={() => setIsHistoryOpen(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Saved Plan History</h2>
+              <button className="modal-close-btn" onClick={() => setIsHistoryOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group" style={{ marginBottom: '1.5rem', maxWidth: '300px' }}>
+                <label><Calendar size={14} style={{ display: 'inline', marginRight: '4px' }}/> History Date</label>
+                <input 
+                  type="date" 
+                  value={historyDate}
+                  onChange={(e) => setHistoryDate(e.target.value)}
+                  className="date-picker"
+                />
+              </div>
+              
+              {records.filter(r => r.date === historyDate).length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
+                  <p>No saved plan found for {historyDate}.</p>
+                </div>
+              ) : (
+                <div className="table-container">
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>Period</th>
+                        <th>Class</th>
+                        <th>Subject</th>
+                        <th>Absent Teacher</th>
+                        <th>Assigned To</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {records
+                        .filter(r => r.date === historyDate)
+                        .sort((a, b) => a.period - b.period)
+                        .map(record => {
+                          const orig = teachers.find(t => t.id === record.original_teacher_id);
+                          const adj = teachers.find(t => t.id === record.adjusted_teacher_id);
+                          return (
+                            <tr key={record.id}>
+                              <td>{record.period}</td>
+                              <td>{record.class_name}</td>
+                              <td>{record.subject}</td>
+                              <td style={{ color: 'var(--text-secondary)' }}>{orig?.name || record.original_teacher_id}</td>
+                              <td style={{ fontWeight: 600 }}>{adj?.name || record.adjusted_teacher_id}</td>
+                            </tr>
+                          );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Manual Modal */}
+      {isManualOpen && (
+        <div className="modal-overlay" onClick={() => setIsManualOpen(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Teacher Manual & Quick Guide</h2>
+              <button className="modal-close-btn" onClick={() => setIsManualOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            <div className="modal-body">
+              <TeacherManual />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`toast ${toast.type}`}>
+          {toast.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+          <span>{toast.message}</span>
+        </div>
+      )}
     </div>
   );
 }

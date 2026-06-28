@@ -1,4 +1,4 @@
-.app-container {
+﻿.app-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--spacing-xl) var(--spacing-md);
@@ -217,13 +217,15 @@
 }
 
 .badge.ok {
-  background-color: rgba(68, 255, 68, 0.2);
-  color: var(--success-color);
+  background-color: transparent;
+  border: 1px solid var(--text-secondary);
+  color: var(--text-primary);
 }
 
 .badge.mismatch {
-  background-color: rgba(255, 170, 0, 0.2);
-  color: var(--warning-color);
+  background-color: var(--surface-hover);
+  border: 1px dashed var(--text-primary);
+  color: var(--text-primary);
 }
 
 .multi-select-container {
@@ -301,3 +303,4 @@
     padding: var(--spacing-sm);
   }
 }
+
