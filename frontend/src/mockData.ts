@@ -30,8 +30,8 @@ export const mockRecords: AdjustmentRecord[] = [
         subject: 'Biology',
         original_teacher_id: 't2',
         adjusted_teacher_id: 't3',
-        correlation_level: 'LOW',
-        designation_match: 'OK',
-        soft_constraints_violated: []
+        correlation_level: 1,
+        designation_match: true,
+        soft_constraints_violated: 0
     }
 ];

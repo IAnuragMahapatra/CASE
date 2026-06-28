@@ -29,9 +29,9 @@ export interface AdjustmentRecord {
   subject: string;
   original_teacher_id: string;
   adjusted_teacher_id: string;
-  correlation_level: "SAME" | "SAME_GROUP" | "HIGH" | "MEDIUM" | "LOW";
-  designation_match: "OK" | "MISMATCH";
-  soft_constraints_violated: string[];
+  correlation_level: number;
+  designation_match: boolean;
+  soft_constraints_violated: number;
 }
 
 export interface Vacancy {

@@ -109,9 +109,12 @@ function App() {
       subject: p.slot.subject,
       original_teacher_id: p.original_teacher_id,
       adjusted_teacher_id: p.adjusted_teacher_id,
-      correlation_level: p.correlation_level,
-      designation_match: p.designation_match,
-      soft_constraints_violated: p.soft_constraints_violated
+      correlation_level: p.correlation_level === 'SAME' ? 5 :
+                         p.correlation_level === 'SAME_GROUP' ? 4 :
+                         p.correlation_level === 'HIGH' ? 3 :
+                         p.correlation_level === 'MEDIUM' ? 2 : 1,
+      designation_match: p.designation_match === 'OK',
+      soft_constraints_violated: p.soft_constraints_violated.length
     }));
     
     const { error: insertError } = await supabase
