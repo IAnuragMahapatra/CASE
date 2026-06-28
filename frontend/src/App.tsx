@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { CASEEngine, type AdjustmentResult } from './engine';
 import { HOLIDAYS, VACATIONS } from './engine/config';
-import { Calendar, Users, Settings2, Save, ArrowLeft, Search, Info, History, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Calendar, Users, Settings2, Save, ArrowLeft, Search, Info, History, AlertCircle, CheckCircle2, Trash2, Lock } from 'lucide-react';
 import { supabase } from './supabaseClient';
 import type { Teacher, TimetableSlot, AdjustmentRecord } from './engine/types';
 import logo from './assets/logo.png';
@@ -11,7 +11,19 @@ import './toast.css';
 
 const DAY_MAPPING = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
+const TARGET_HASH = '42b5bf6a3fa51849bc05c7050141a81591133b5f470cdef4ff6628e1222ff0a1';
+
+async function hashPassword(password: string) {
+  const msgUint8 = new TextEncoder().encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => localStorage.getItem('case_auth') === 'true');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [loginError, setLoginError] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>('2026-06-29'); // A Monday
   const [searchQuery, setSearchQuery] = useState('');
   const [absentTeacherIds, setAbsentTeacherIds] = useState<Set<string>>(new Set());
@@ -152,6 +164,24 @@ function App() {
     setAbsentTeacherIds(newSet);
   };
 
+  const handleDeletePlan = async () => {
+    if (!window.confirm(`Are you sure you want to delete the plan for ${historyDate}?`)) return;
+    
+    setLoading(true);
+    const { error } = await supabase
+      .from('adjustment_records')
+      .delete()
+      .eq('date', historyDate);
+      
+    if (error) {
+      showToast('Failed to delete plan: ' + error.message, 'error');
+    } else {
+      showToast('Plan deleted successfully!', 'success');
+      setRecords(records.filter(r => r.date !== historyDate));
+    }
+    setLoading(false);
+  };
+
   if (loading) {
     return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading application data...</div>;
   }
@@ -161,6 +191,47 @@ function App() {
       <div style={{ padding: '2rem', textAlign: 'center', color: '#ef4444' }}>
         <h2>Database Connection Error</h2>
         <p>{errorMsg}</p>
+      </div>
+    );
+  }
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const hash = await hashPassword(passwordInput);
+    if (hash === TARGET_HASH) {
+      localStorage.setItem('case_auth', 'true');
+      setIsAuthenticated(true);
+      setLoginError(false);
+    } else {
+      setLoginError(true);
+      setPasswordInput('');
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="login-container">
+        <div className="login-card">
+          <div className="login-icon">
+            <Lock size={32} />
+          </div>
+          <h1 className="login-title">CASE Access</h1>
+          <p className="login-subtitle">Enter password to continue</p>
+          <form onSubmit={handleLogin} className="login-form">
+            <input 
+              type="password" 
+              className={`input-field login-input ${loginError ? 'error' : ''}`}
+              placeholder="Password"
+              value={passwordInput}
+              onChange={(e) => { setPasswordInput(e.target.value); setLoginError(false); }}
+              autoFocus
+            />
+            {loginError && <span className="login-error-text">Incorrect password</span>}
+            <button type="submit" className="btn login-btn">
+              Unlock
+            </button>
+          </form>
+        </div>
       </div>
     );
   }
@@ -336,7 +407,21 @@ function App() {
                 <button className="btn btn-secondary" onClick={() => setActiveView('selection')} style={{ padding: '0.5rem' }}>
                   <ArrowLeft size={18} />
                 </button>
-                <h2 className="card-title" style={{ margin: 0 }}>Saved Plan History</h2>
+                <h2 className="card-title" style={{ margin: 0, flex: 1 }}>Saved Plan History</h2>
+                {records.filter(r => r.date === historyDate).length > 0 && (
+                  (() => {
+                    const today = new Date();
+                    const y = today.getFullYear();
+                    const m = String(today.getMonth() + 1).padStart(2, '0');
+                    const d = String(today.getDate()).padStart(2, '0');
+                    const localToday = `${y}-${m}-${d}`;
+                    return historyDate >= localToday;
+                  })()
+                ) && (
+                  <button className="icon-button" onClick={handleDeletePlan} title="Delete Plan" style={{ color: 'var(--text-secondary)' }}>
+                    <Trash2 size={20} />
+                  </button>
+                )}
               </div>
               
               <div className="form-group" style={{ marginBottom: '1.5rem', maxWidth: '300px' }}>
