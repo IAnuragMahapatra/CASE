@@ -1,0 +1,47 @@
+{
+  "constrain": {
+    "completedAt": "2026-06-28T14:05:00Z",
+    "conceptualDirection": {
+      "audience": "School Administrators and Schedulers",
+      "memorableThing": "Instant Class Adjustments",
+      "aestheticRegister": "Professional, clean, functional"
+    },
+    "colorStrategy": "restrained",
+    "theme": {
+      "mode": "dark",
+      "sceneJustification": "High contrast black and white theme requested by user for maximum focus."
+    },
+    "fontPair": {
+      "display": "Inter, system-ui",
+      "body": "Inter, system-ui",
+      "mono": "monospace"
+    },
+    "bansAcknowledged": ["TailwindCSS (unless requested)"]
+  },
+  "architect": {
+    "tokens": {
+      "primitive": {
+        "colors": {
+          "background": "#000000",
+          "surface": "#111111",
+          "surface-hover": "#222222",
+          "text": "#ffffff",
+          "text-secondary": "#888888",
+          "border": "#333333"
+        }
+      },
+      "motion": {
+        "ease-out": "cubic-bezier(0.16, 1, 0.3, 1)"
+      }
+    },
+    "componentList": ["InputForm", "AbsentTeachersMultiSelect", "AdjustmentTable", "Badge"]
+  },
+  "build": {
+    "stack": "React, Vite, Vanilla CSS",
+    "filesGenerated": [
+      "frontend/src/App.tsx",
+      "frontend/src/App.css",
+      "frontend/src/index.css"
+    ]
+  }
+}
