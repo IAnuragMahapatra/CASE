@@ -78,6 +78,7 @@ function App() {
   const handleGenerate = () => {
     if (!engine) return;
     const result = engine.generatePlan(selectedDate, Array.from(absentTeacherIds));
+    result.sort((a, b) => a.slot.period - b.slot.period);
     setPlan(result);
     setActiveView('results');
   };
