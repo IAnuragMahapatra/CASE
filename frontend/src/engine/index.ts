@@ -173,7 +173,8 @@ export class CASEEngine {
             }
             
             const correlation = getCorrelationLevel(candidate.subject_group, vacancy.subject, originalGroup);
-            const match = getDesignationMatch(candidate.designation, vacancy.class_level);
+            const match = getDesignationMatch(candidate.designation, vacancy.class_level, candidate.name);
+            if (match === 'DISALLOWED') continue;
             let score = getTierScore(correlation, match);
             
             const monthlyCount = this.monthlyCounts.get(candidate.id) || 0;

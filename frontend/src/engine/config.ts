@@ -70,38 +70,50 @@ export const VACATIONS = [
     { start: "2026-12-26", end: "2026-12-31", name: "Winter Vacation" }
 ];
 
-export function getDesignationMatch(candidateDesignation: string, requiredLevelStr: string): 'OK' | 'MISMATCH' {
+export function getDesignationMatch(candidateDesignation: string, requiredLevelStr: string, candidateName: string = ''): 'OK' | 'MISMATCH' | 'DISALLOWED' {
   if (!requiredLevelStr) return 'OK'; // If slot doesn't have a specific level
   
   const reqClass = parseInt(requiredLevelStr, 10);
   if (isNaN(reqClass)) return 'OK';
 
-  let minClass = 0;
-  let maxClass = 12;
+  let primaryMin = -1;
+  let primaryMax = -1;
+  let fallbackMin = -1;
+  let fallbackMax = -1;
 
   switch (candidateDesignation) {
     case 'PPRT':
-      minClass = 0;
-      maxClass = 2;
+      primaryMin = 0; primaryMax = 0;
+      fallbackMin = 0; fallbackMax = 2;
       break;
     case 'PRT':
-      minClass = 1;
-      maxClass = 8;
+      primaryMin = 1; primaryMax = 5;
+      fallbackMin = 1; fallbackMax = 7;
       break;
     case 'TGT':
-      minClass = 5;
-      maxClass = 12;
+      primaryMin = 6; primaryMax = 10;
+      fallbackMin = 3; fallbackMax = 12;
       break;
     case 'PGT':
-      minClass = 9;
-      maxClass = 12;
+      primaryMin = 11; primaryMax = 12;
+      fallbackMin = 6; fallbackMax = 12;
+      break;
+    case 'Staff':
+      if (candidateName === 'New Nurse') {
+        // Only covers nursery/LKG/UKG in worst case
+        primaryMin = -1; primaryMax = -1;
+        fallbackMin = 0; fallbackMax = 0;
+      }
       break;
   }
   
-  if (reqClass >= minClass && reqClass <= maxClass) {
+  if (reqClass >= primaryMin && reqClass <= primaryMax) {
     return 'OK';
   }
-  return 'MISMATCH';
+  if (reqClass >= fallbackMin && reqClass <= fallbackMax) {
+    return 'MISMATCH';
+  }
+  return 'DISALLOWED';
 }
 
 export function getGroupForSubject(subject: string): string {
@@ -126,7 +138,7 @@ export function getCorrelationLevel(candidateSubject: string, vacancySubject: st
   return 'LOW';
 }
 
-export function getTierScore(correlation: string, match: 'OK' | 'MISMATCH'): number {
+export function getTierScore(correlation: string, match: 'OK' | 'MISMATCH' | 'DISALLOWED'): number {
   const isOk = match === 'OK';
   const factor = isOk ? 1 : CONFIG.DESIGNATION_MISMATCH_FACTOR;
   
