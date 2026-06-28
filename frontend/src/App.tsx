@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { CASEEngine, type AdjustmentResult } from './engine';
+import { HOLIDAYS, VACATIONS } from './engine/config';
 import { Calendar, Users, Settings2, Save, ArrowLeft, Search } from 'lucide-react';
 import { supabase } from './supabaseClient';
 import type { Teacher, TimetableSlot, AdjustmentRecord } from './engine/types';
@@ -42,6 +43,22 @@ function App() {
     }
     loadData();
   }, []);
+
+  useEffect(() => {
+    const teachersForDate = new Set<string>();
+    for (const r of records) {
+      if (r.date === selectedDate) {
+        teachersForDate.add(r.original_teacher_id);
+      }
+    }
+    // Only update if it's different to avoid unnecessary re-renders if user is manually checking/unchecking
+    setAbsentTeacherIds(prev => {
+      if (prev.size === teachersForDate.size && [...prev].every(id => teachersForDate.has(id))) {
+        return prev;
+      }
+      return teachersForDate;
+    });
+  }, [selectedDate, records]);
 
   const engine = useMemo(() => {
     if (loading) return null;
@@ -174,9 +191,29 @@ function App() {
               </div>
             </div>
 
-            <button className="btn" onClick={handleGenerate} style={{ width: '100%' }}>
-              <Settings2 size={18} /> Generate Plan
-            </button>
+            {(() => {
+              const holidayName = HOLIDAYS[selectedDate];
+              let vacationName = null;
+              if (!holidayName) {
+                for (const vac of VACATIONS) {
+                  if (selectedDate >= vac.start && selectedDate <= vac.end) {
+                    vacationName = vac.name;
+                    break;
+                  }
+                }
+              }
+              const isBlocked = holidayName || vacationName;
+              return isBlocked ? (
+                <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--bg-secondary)', borderRadius: '8px', borderLeft: '4px solid #ef4444' }}>
+                  <h3 style={{ color: '#ef4444', marginBottom: '0.5rem' }}>School is Closed</h3>
+                  <p>{holidayName ? `Holiday: ${holidayName}` : `Vacation: ${vacationName}`}</p>
+                </div>
+              ) : (
+                <button className="btn" onClick={handleGenerate} style={{ width: '100%' }}>
+                  <Settings2 size={18} /> Generate Plan
+                </button>
+              );
+            })()}
           </div>
         </section>
         ) : (
