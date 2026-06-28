@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { CASEEngine, type AdjustmentResult } from './engine';
 import { HOLIDAYS, VACATIONS } from './engine/config';
-import { Calendar, Users, Settings2, Save, ArrowLeft, Search, Info, History, X, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Calendar, Users, Settings2, Save, ArrowLeft, Search, Info, History, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { supabase } from './supabaseClient';
 import type { Teacher, TimetableSlot, AdjustmentRecord } from './engine/types';
 import logo from './assets/logo.png';
@@ -16,7 +16,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [absentTeacherIds, setAbsentTeacherIds] = useState<Set<string>>(new Set());
   const [plan, setPlan] = useState<AdjustmentResult[] | null>(null);
-  const [activeView, setActiveView] = useState<'selection' | 'results'>('selection');
+  const [activeView, setActiveView] = useState<'selection' | 'results' | 'history' | 'manual'>('selection');
   
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [slots, setSlots] = useState<TimetableSlot[]>([]);
@@ -26,8 +26,6 @@ function App() {
 
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
-  const [isManualOpen, setIsManualOpen] = useState(false);
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [historyDate, setHistoryDate] = useState<string>('2026-06-29');
 
   const showToast = (message: string, type: 'success' | 'error') => {
@@ -170,25 +168,25 @@ function App() {
   return (
     <div className="app-container">
       <header className="header">
+        <div className="header-actions">
+          <button className="icon-button" onClick={() => setActiveView('history')} title="View Saved Plans">
+            <History size={20} />
+          </button>
+          <button className="icon-button" onClick={() => setActiveView('manual')} title="Quick Guide">
+            <Info size={20} />
+          </button>
+        </div>
         <div className="school-banner">
           <img src={logo} alt="DAV CMC Logo" className="school-logo" />
           <h2 className="school-name">DAV PUBLIC SCHOOL,<br/>MCL, IB VALLEY AREA, BRAJRAJNAGAR</h2>
         </div>
         <div className="app-title-badge">
           <span><strong>CASE</strong> : Class Adjustment and Substitution Engine</span>
-          <div className="header-actions">
-            <button className="icon-button" onClick={() => setIsHistoryOpen(true)} title="View Saved Plans">
-              <History size={18} />
-            </button>
-            <button className="icon-button" onClick={() => setIsManualOpen(true)} title="Quick Guide">
-              <Info size={18} />
-            </button>
-          </div>
         </div>
       </header>
 
       <main className="main-layout">
-        {activeView === 'selection' ? (
+        {activeView === 'selection' && (
         <section className="input-section">
           <div className="card">
             <h2 className="card-title">Setup Adjustment</h2>
@@ -258,7 +256,9 @@ function App() {
             })()}
           </div>
         </section>
-        ) : (
+        )}
+
+        {activeView === 'results' && (
         <section className="output-section">
           {plan ? (
             <div className="card">
@@ -327,19 +327,17 @@ function App() {
           )}
         </section>
         )}
-      </main>
 
-      {/* History Modal */}
-      {isHistoryOpen && (
-        <div className="modal-overlay" onClick={() => setIsHistoryOpen(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Saved Plan History</h2>
-              <button className="modal-close-btn" onClick={() => setIsHistoryOpen(false)}>
-                <X size={20} />
-              </button>
-            </div>
-            <div className="modal-body">
+        {activeView === 'history' && (
+          <section className="output-section">
+            <div className="card">
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
+                <button className="btn btn-secondary" onClick={() => setActiveView('selection')} style={{ padding: '0.5rem' }}>
+                  <ArrowLeft size={18} />
+                </button>
+                <h2 className="card-title" style={{ margin: 0 }}>Saved Plan History</h2>
+              </div>
+              
               <div className="form-group" style={{ marginBottom: '1.5rem', maxWidth: '300px' }}>
                 <label><Calendar size={14} style={{ display: 'inline', marginRight: '4px' }}/> History Date</label>
                 <input 
@@ -388,26 +386,25 @@ function App() {
                 </div>
               )}
             </div>
-          </div>
-        </div>
-      )}
+          </section>
+        )}
 
-      {/* Manual Modal */}
-      {isManualOpen && (
-        <div className="modal-overlay" onClick={() => setIsManualOpen(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Teacher Manual & Quick Guide</h2>
-              <button className="modal-close-btn" onClick={() => setIsManualOpen(false)}>
-                <X size={20} />
-              </button>
+        {activeView === 'manual' && (
+          <section className="output-section">
+            <div className="card">
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
+                <button className="btn btn-secondary" onClick={() => setActiveView('selection')} style={{ padding: '0.5rem' }}>
+                  <ArrowLeft size={18} />
+                </button>
+                <h2 className="card-title" style={{ margin: 0 }}>Teacher Manual & Quick Guide</h2>
+              </div>
+              <div style={{ overflowY: 'auto', flex: 1, paddingRight: '0.5rem' }}>
+                <TeacherManual />
+              </div>
             </div>
-            <div className="modal-body">
-              <TeacherManual />
-            </div>
-          </div>
-        </div>
-      )}
+          </section>
+        )}
+      </main>
 
       {/* Toast Notification */}
       {toast && (
